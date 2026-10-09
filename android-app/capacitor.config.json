@@ -1,0 +1,9 @@
+{
+  "appId": "org.icescript.player",
+  "appName": "Icescript Player",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}

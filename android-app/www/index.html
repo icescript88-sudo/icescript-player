@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Icescript Player</title>
+  <style>
+    :root {
+      --bg-dark: #070a0f;
+      --card-bg: #101622;
+      --card-border: #1a2333;
+      --accent: #00d2fc;
+      --accent-hover: #38bdf8;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --success: #22c55e;
+      --danger: #ef4444;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Bar */
+    header {
+      background: rgba(16, 22, 34, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00d2fc, #0284c7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .brand-title {
+      font-size: 17px;
+      font-weight: bold;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+    .header-btns {
+      display: flex;
+      gap: 8px;
+    }
+    .icon-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Views */
+    .view {
+      display: none;
+      padding: 16px;
+      flex: 1;
+    }
+    .view.active {
+      display: block;
+    }
+
+    /* Activation Card */
+    .activation-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 24px 20px;
+      margin-top: 30px;
+      text-align: center;
+    }
+    .activation-title {
+      font-size: 19px;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .device-box {
+      background: #090e17;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 16px 0;
+      border: 1px dashed #26334d;
+    }
+    .device-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .device-id {
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      margin-top: 4px;
+      letter-spacing: 1px;
+    }
+    .input-key {
+      width: 100%;
+      background: #090e17;
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      text-align: center;
+      margin-bottom: 14px;
+      outline: none;
+    }
+    .input-key:focus {
+      border-color: var(--accent);
+    }
+    .btn-primary {
+      width: 100%;
+      background: linear-gradient(135deg, #0284c7, #00d2fc);
+      border: none;
+      color: #fff;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Course Cards */
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 14px;
+      color: var(--text);
+    }
+    .course-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    .course-info h3 {
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+    .course-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .course-badge {
+      background: #00d2fc22;
+      color: var(--accent);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    /* Video Player View */
+    .video-container {
+      width: 100%;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    video {
+      width: 100%;
+      max-height: 55vh;
+      display: block;
+    }
+    .player-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    /* About Modal / View */
+    .about-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    .creator-name {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .creator-role {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .creator-desc {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+    .contact-item {
+      font-size: 13px;
+      padding: 6px 0;
+      color: var(--text);
+    }
+    .contact-item a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      border: 1px solid #334155;
+      display: none;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">❄</div>
+      <div class="brand-title">Icescript Player</div>
+    </div>
+    <div class="header-btns">
+      <button class="icon-btn" onclick="openAbout()">ℹ️ Sobre</button>
+    </div>
+  </header>
+
+  <!-- View 1: Activation -->
+  <main id="view-activation" class="view active">
+    <div class="activation-card">
+      <h2 class="activation-title">Ativação do Aparelho</h2>
+      <p style="font-size: 13px; color: var(--text-muted);">Este aplicativo é protegido contra pirataria. Ative com a sua licença offline.</p>
+      
+      <div class="device-box">
+        <div class="device-label">Identificador Deste Dispositivo</div>
+        <div class="device-id" id="display-dev-id">ICES-A835-844B-373C</div>
+      </div>
+
+      <input type="text" id="license-input" class="input-key" placeholder="ACT-XXXX-XXXX-XXXX-XXXX" autocapitalize="characters">
+      <button class="btn-primary" onclick="activateDevice()">Ativar Agora</button>
+    </div>
+  </main>
+
+  <!-- View 2: Course Catalog -->
+  <main id="view-catalog" class="view">
+    <h2 class="section-title">📚 Cursos Disponíveis</h2>
+    <div id="course-list">
+      <div class="course-card" onclick="openCourse('Curso de Importação')">
+        <div class="course-info">
+          <h3>Curso de Importação</h3>
+          <p>16 videoaulas e materiais</p>
+        </div>
+        <span class="course-badge">Acessar</span>
+      </div>
+      <div class="course-card" onclick="openCourse('Marketing Digital')">
+        <div class="course-info">
+          <h3>Marketing Digital</h3>
+          <p>20 aulas práticas</p>
+        </div>
+        <span class="course-badge">Acessar</span>
+      </div>
+      <div class="course-card" onclick="openCourse('Tráfego Pago')">
+        <div class="course-info">
+          <h3>Tráfego Pago</h3>
+          <p>Aulas avançadas</p>
+        </div>
+        <span class="course-badge">Acessar</span>
+      </div>
+      <div class="course-card" onclick="openCourse('Ebooks e Materiais')">
+        <div class="course-info">
+          <h3>Ebooks & Apoio</h3>
+          <p>Apostilas em PDF</p>
+        </div>
+        <span class="course-badge">Acessar</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- View 3: Video Player -->
+  <main id="view-player" class="view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <button class="icon-btn" onclick="backToCatalog()">← Catálogo</button>
+      <h3 id="current-lesson-title" style="font-size: 15px; color: var(--accent);">Reproduzindo</h3>
+    </div>
+    
+    <div class="video-container">
+      <video id="mobile-video" controls playsinline>
+        <source src="" type="video/mp4">
+        Seu aparelho não suporta reprodução de vídeo.
+      </video>
+    </div>
+  </main>
+
+  <!-- View 4: About Creators -->
+  <main id="view-about" class="view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+      <h2 class="section-title" style="margin: 0;">👥 Sobre os Criadores</h2>
+      <button class="icon-btn" onclick="closeAbout()">✕ Fechar</button>
+    </div>
+
+    <!-- Arthur -->
+    <div class="about-card">
+      <div class="creator-name">👨‍💻 Arthur Rwoud</div>
+      <div class="creator-role">Criador & Fundador da Icescript</div>
+      <div class="creator-desc">
+        Idealizador do Icescript Player e responsável por arquitetar as soluções de criptografia, 
+        segurança de conteúdo e desenvolvimento de software da marca.
+      </div>
+    </div>
+
+    <!-- Leandro -->
+    <div class="about-card">
+      <div class="creator-name">🤝 José Leandro</div>
+      <div class="creator-role">Colaborador de Desenvolvimento</div>
+      <div class="creator-desc">
+        Parceiro fundamental no desenvolvimento, colaborando ativamente na usabilidade, estabilidade e experiência do aluno.
+      </div>
+    </div>
+
+    <!-- Contatos -->
+    <div class="about-card">
+      <div class="creator-name" style="color: #38bdf8;">🔗 Contato & Suporte</div>
+      <div class="contact-item">🌐 <b>Site:</b> <a href="https://icescript.netlify.app/" target="_blank">icescript.netlify.app</a></div>
+      <div class="contact-item">📱 <b>WhatsApp:</b> <span style="color: var(--success); font-weight: bold;">+244 935 935 960</span></div>
+      <div class="contact-item">📘 <b>Facebook:</b> <a href="https://web.facebook.com/ArthurRwoud/" target="_blank">Perfil do Arthur</a></div>
+      <div class="contact-item">✉️ <b>E-mails:</b> icescript88@gmail.com | felisminoartur5@gmail.com</div>
+    </div>
+  </main>
+
+  <div id="toast"></div>
+
+  <script>
+    // Gerar ou carregar Device ID local
+    let deviceId = localStorage.getItem("ices_dev_id");
+    if (!deviceId) {
+      const randHex = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1).toUpperCase();
+      deviceId = `ICES-${randHex()}-${randHex()}-${randHex()}-${randHex()}`;
+      localStorage.setItem("ices_dev_id", deviceId);
+    }
+    document.getElementById("display-dev-id").innerText = deviceId;
+
+    // Checar ativacao salva
+    if (localStorage.getItem("ices_activated") === "true") {
+      switchView("catalog");
+    }
+
+    function switchView(viewName) {
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.getElementById("view-" + viewName).classList.add("active");
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.innerText = msg;
+      t.style.display = "block";
+      setTimeout(() => { t.style.display = "none"; }, 3000);
+    }
+
+    function activateDevice() {
+      const input = document.getElementById("license-input").value.trim().toUpperCase();
+      if (input.startsWith("ACT-") && input.length >= 19) {
+        localStorage.setItem("ices_activated", "true");
+        showToast("✅ Aparelho ativado com sucesso!");
+        setTimeout(() => { switchView("catalog"); }, 500);
+      } else {
+        showToast("❌ Chave inválida para este aparelho.");
+      }
+    }
+
+    function openCourse(courseName) {
+      document.getElementById("current-lesson-title").innerText = courseName;
+      switchView("player");
+    }
+
+    function backToCatalog() {
+      const video = document.getElementById("mobile-video");
+      video.pause();
+      switchView("catalog");
+    }
+
+    let previousView = "activation";
+    function openAbout() {
+      const activeView = document.querySelector(".view.active");
+      if (activeView) previousView = activeView.id.replace("view-", "");
+      switchView("about");
+    }
+
+    function closeAbout() {
+      switchView(previousView);
+    }
+  </script>
+</body>
+</html>
