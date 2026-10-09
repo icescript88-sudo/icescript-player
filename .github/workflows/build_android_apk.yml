@@ -28,17 +28,17 @@ jobs:
       - name: Install System Build Tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libffi-dev libssl-dev cmake
+          sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libffi-dev libssl-dev cmake ccache clang lld libncurses-dev
 
       - name: Install Buildozer & Cython
         run: |
           pip install --upgrade pip
-          pip install Cython==0.29.36 buildozer
+          pip install "cython<3.0" buildozer
 
       - name: Build APK with Buildozer
         working-directory: ./android
         run: |
-          buildozer android debug
+          buildozer -v android debug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
