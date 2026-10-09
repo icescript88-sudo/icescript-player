@@ -134,11 +134,12 @@ class ActivationScreen(Screen):
 
 class CourseListScreen(Screen):
     """Mobile Course & Lesson Browser Screen."""
-    def __init__(self, db: Database, enc_mgr: AndroidEncryptionManager, on_play_callback, **kwargs):
+    def __init__(self, db: Database, enc_mgr: AndroidEncryptionManager, on_play_callback, on_about_callback=None, **kwargs):
         super().__init__(**kwargs)
         self.db = db
         self.enc_mgr = enc_mgr
         self.on_play = on_play_callback
+        self.on_about = on_about_callback
 
         root = BoxLayout(orientation='vertical')
 
@@ -158,6 +159,17 @@ class CourseListScreen(Screen):
             halign='left',
             valign='middle'
         ))
+
+        if self.on_about:
+            about_btn = Button(
+                text="ℹ️ Sobre",
+                size_hint_x=0.3,
+                background_color=MobileTheme.CARD_BG,
+                font_size='13sp'
+            )
+            about_btn.bind(on_press=lambda *a: self.on_about())
+            top_bar.add_widget(about_btn)
+
         root.add_widget(top_bar)
 
         # Scrollable list
@@ -248,3 +260,86 @@ class PlayerScreen(Screen):
         if self.active_temp_file:
             self.enc_mgr.remove_cache_file(self.active_temp_file)
             self.active_temp_file = None
+
+
+class AboutScreen(Screen):
+    """Mobile screen presenting creators Arthur Rwoud and Jose Leandro with contacts."""
+    def __init__(self, on_back_callback, **kwargs):
+        super().__init__(**kwargs)
+        self.on_back = on_back_callback
+
+        root = BoxLayout(orientation='vertical')
+
+        # Top Bar
+        top_bar = BoxLayout(size_hint_y=0.1, padding=[dp(16), dp(8)], spacing=dp(10))
+        with top_bar.canvas.before:
+            Color(*MobileTheme.CARD_BG)
+            self.top_rect = Rectangle(pos=top_bar.pos, size=top_bar.size)
+        top_bar.bind(pos=lambda *a: setattr(self.top_rect, 'pos', top_bar.pos),
+                     size=lambda *a: setattr(self.top_rect, 'size', top_bar.size))
+
+        back_btn = Button(text="← Voltar", size_hint_x=0.25, background_color=MobileTheme.CARD_BG)
+        back_btn.bind(on_press=lambda *a: self.on_back())
+        top_bar.add_widget(back_btn)
+
+        top_bar.add_widget(Label(
+            text="[b]Sobre os Criadores[/b]",
+            markup=True,
+            font_size='17sp',
+            color=MobileTheme.ACCENT_CYAN,
+            halign='left',
+            valign='middle'
+        ))
+        root.add_widget(top_bar)
+
+        # Scrollable content
+        scroll = ScrollView(size_hint_y=0.9)
+        content = GridLayout(cols=1, spacing=dp(14), padding=dp(16), size_hint_y=None)
+        content.bind(minimum_height=content.setter('height'))
+
+        # Card 1: Arthur
+        c1 = StyledCard(orientation='vertical', padding=dp(14), spacing=dp(6), size_hint_y=None, height=dp(130))
+        c1.add_widget(Label(
+            text="[b]👨‍💻 Arthur Rwoud[/b]\n[size=12sp][color=38bdf8]Criador & Fundador da Icescript[/color][/size]",
+            markup=True, font_size='15sp', color=MobileTheme.TEXT_LIGHT, halign='left'
+        ))
+        c1.add_widget(Label(
+            text="Idealizador do Icescript Player, arquiteto das soluções de segurança, criptografia AES-256 e desenvolvimento geral do sistema.",
+            color=MobileTheme.TEXT_MUTED, font_size='12sp', halign='left', valign='top'
+        ))
+        content.add_widget(c1)
+
+        # Card 2: Leandro
+        c2 = StyledCard(orientation='vertical', padding=dp(14), spacing=dp(6), size_hint_y=None, height=dp(110))
+        c2.add_widget(Label(
+            text="[b]🤝 José Leandro[/b]\n[size=12sp][color=38bdf8]Colaborador do Projeto[/color][/size]",
+            markup=True, font_size='15sp', color=MobileTheme.TEXT_LIGHT, halign='left'
+        ))
+        c2.add_widget(Label(
+            text="Parceiro fundamental no desenvolvimento, focado na usabilidade, estabilidade e garantia de qualidade do player.",
+            color=MobileTheme.TEXT_MUTED, font_size='12sp', halign='left', valign='top'
+        ))
+        content.add_widget(c2)
+
+        # Card 3: Contatos
+        c3 = StyledCard(orientation='vertical', padding=dp(14), spacing=dp(6), size_hint_y=None, height=dp(150))
+        c3.add_widget(Label(
+            text="[b]🔗 Contatos Oficiais[/b]",
+            markup=True, font_size='15sp', color=MobileTheme.ACCENT_CYAN, halign='left'
+        ))
+        contacts_text = (
+            "• Site: icescript.netlify.app\n"
+            "• WhatsApp: +244 935 935 960\n"
+            "• Facebook: Arthur Rwoud\n"
+            "• E-mails: icescript88@gmail.com | felisminoartur5@gmail.com"
+        )
+        c3.add_widget(Label(
+            text=contacts_text,
+            color=MobileTheme.TEXT_LIGHT, font_size='12sp', halign='left'
+        ))
+        content.add_widget(c3)
+
+        scroll.add_widget(content)
+        root.add_widget(scroll)
+
+        self.add_widget(root)

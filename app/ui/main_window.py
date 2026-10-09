@@ -36,6 +36,7 @@ from app.ui.pdf_viewer import PdfViewer
 from app.ui.notes_dialog import NotesDialog
 from app.ui.admin_auth_dialog import AdminAuthDialog
 from app.ui.encrypt_dialog import EncryptDialog
+from app.ui.about_dialog import AboutDialog
 from app.ui.i18n import I18n, t
 from app.ui.styles import THEMES, CINEMATIC_THEME, EDITORIAL_THEME
 from app.video.video_manager import VideoManager
@@ -158,6 +159,13 @@ class MainWindow(QMainWindow):
         self.skin_btn.setToolTip("Alternar Tema / Toggle Skin")
         self.skin_btn.clicked.connect(self._toggle_skin)
         nav_layout.addWidget(self.skin_btn)
+
+        # About Us Button
+        self.about_btn = QPushButton(t("nav_about"))
+        self.about_btn.setObjectName("nav_skin_btn")
+        self.about_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.about_btn.clicked.connect(self._open_about_dialog)
+        nav_layout.addWidget(self.about_btn)
 
         # Action Buttons
         self.scan_btn = QPushButton("🔄")
@@ -561,6 +569,7 @@ class MainWindow(QMainWindow):
         self.tab_continue.setText(t("nav_continue"))
         self.lang_btn.setText(t("lang_btn"))
         self.skin_btn.setText(t("skin_editorial") if self._current_skin == "editorial" else t("skin_hbo"))
+        self.about_btn.setText(t("nav_about"))
         self.scan_btn.setToolTip(t("nav_scan_tooltip"))
         self.protect_btn.setText(t("nav_protect"))
 
@@ -1132,6 +1141,11 @@ class MainWindow(QMainWindow):
         dlg = EncryptDialog(self.encryption_mgr, auth=self.auth, parent=self)
         dlg.exec()
         self._scan_library()
+
+    def _open_about_dialog(self):
+        """Display the rich-text dialog about Arthur Rwoud, Jose Leandro and Icescript contacts."""
+        dlg = AboutDialog(self)
+        dlg.exec()
 
     def closeEvent(self, event):
         self._save_progress()

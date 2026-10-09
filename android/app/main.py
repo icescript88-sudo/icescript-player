@@ -20,7 +20,7 @@ from app.database.database import Database
 from app.security.authentication import Authentication
 from app.security.device_binding import AndroidDeviceBinding
 from app.security.encryption import AndroidEncryptionManager
-from app.ui.mobile_ui import ActivationScreen, CourseListScreen, PlayerScreen
+from app.ui.mobile_ui import ActivationScreen, CourseListScreen, PlayerScreen, AboutScreen
 
 
 class IcescriptMobileApp(App):
@@ -50,6 +50,7 @@ class IcescriptMobileApp(App):
             db=self.db,
             enc_mgr=self.enc_mgr,
             on_play_callback=self._on_play_course,
+            on_about_callback=self._on_open_about,
             name="catalog"
         )
         self.player_screen = PlayerScreen(
@@ -57,10 +58,15 @@ class IcescriptMobileApp(App):
             on_back_callback=self._on_back_to_catalog,
             name="player"
         )
+        self.about_screen = AboutScreen(
+            on_back_callback=self._on_back_to_catalog,
+            name="about"
+        )
 
         self.sm.add_widget(self.act_screen)
         self.sm.add_widget(self.catalog_screen)
         self.sm.add_widget(self.player_screen)
+        self.sm.add_widget(self.about_screen)
 
         # Route to initial screen based on activation state
         if self.device_binding.is_activated():
@@ -72,6 +78,9 @@ class IcescriptMobileApp(App):
 
     def _on_activated(self):
         self.sm.current = "catalog"
+
+    def _on_open_about(self):
+        self.sm.current = "about"
 
     def _on_play_course(self, course):
         # If the course has lessons, load first playable
